@@ -24,15 +24,15 @@ build:
       - if: win
         then:
           # workaround for zig 0.15.2 bug: convertPathArg panics on cross-drive paths (Build/Step/Run.zig)
-          - sed -i "s|assert(!std\.fs\.path\.isAbsolute(child_cwd_rel));|if (std.fs.path.isAbsolute(child_cwd_rel)) return child_cwd_rel;|" "${BUILD_PREFIX}\Library\lib\zig\std\Build\Step\Run.zig"
+          - sed -i "s|assert(!std\.fs\.path\.isAbsolute(child_cwd_rel));|if (std.fs.path.isAbsolute(child_cwd_rel)) return child_cwd_rel;|" "${BUILD_PREFIX}/Library/lib/zig/std/Build/Step/Run.zig"
       - cargo auditable install --path=. --root="${PREFIX}" --no-track --locked --bins --target-dir=target
       - cargo-bundle-licenses --format=yaml --output=./THIRDPARTY.yml
-      - >
-        mkdir -p
-          "${PREFIX}/share/bash-completion/completions"
-          "${PREFIX}/share/zsh/site-functions"
-          "${PREFIX}/share/fish/vendor_completions.d"
-          "${PREFIX}/share/elvish/lib"
+      - |
+        mkdir -p \
+          "${PREFIX}/share/bash-completion/completions" \
+          "${PREFIX}/share/zsh/site-functions" \
+          "${PREFIX}/share/fish/vendor_completions.d" \
+          "${PREFIX}/share/elvish/lib" \
           "${PREFIX}/share/herdr/completions"
       - herdr completion bash > "${PREFIX}/share/bash-completion/completions/herdr"
       - herdr completion zsh > "${PREFIX}/share/zsh/site-functions/_herdr"
