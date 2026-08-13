@@ -43,7 +43,7 @@ tests:
   - package_contents:
       bin:
         - herdr
-    strict: true
+      strict: true
   - script:
       - herdr --version
       - herdr --help
