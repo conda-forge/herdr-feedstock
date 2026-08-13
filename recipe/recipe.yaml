@@ -16,18 +16,16 @@ source:
 build:
   number: 1
   script:
+    interpreter: brush
     env:
       CARGO_PROFILE_RELEASE_LTO: fat
       CARGO_PROFILE_RELEASE_STRIP: symbols
     content:
-      - if: unix
-        then:
-          - cargo auditable install --path=. --root="$PREFIX" --no-track --locked --bins --target-dir=target
       - if: win
         then:
           # workaround for zig 0.15.2 bug: convertPathArg panics on cross-drive paths (Build/Step/Run.zig)
           - sed -i "s|assert(!std\.fs\.path\.isAbsolute(child_cwd_rel));|if (std.fs.path.isAbsolute(child_cwd_rel)) return child_cwd_rel;|" "%BUILD_PREFIX%\Library\lib\zig\std\Build\Step\Run.zig"
-          - cargo auditable install --path=. --root="%LIBRARY_PREFIX%" --no-track --locked --bins --target-dir=target
+      - cargo auditable install --path=. --root="${PREFIX}" --no-track --locked --bins --target-dir=target
       - cargo-bundle-licenses --format=yaml --output=./THIRDPARTY.yml
 
 requirements:
@@ -36,6 +34,7 @@ requirements:
     - ${{ compiler('rust') }}
     - ${{ stdlib('c') }}
     - ${{ 'm2-sed' if win }}
+    - brush
     - cargo-auditable
     - cargo-bundle-licenses
     - 'zig >=0.15.2,<0.16'  # upstream issue: https://github.com/ogulcancelik/herdr/issues/285
