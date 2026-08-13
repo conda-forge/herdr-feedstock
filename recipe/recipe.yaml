@@ -27,6 +27,18 @@ build:
           - sed -i "s|assert(!std\.fs\.path\.isAbsolute(child_cwd_rel));|if (std.fs.path.isAbsolute(child_cwd_rel)) return child_cwd_rel;|" "${BUILD_PREFIX}\Library\lib\zig\std\Build\Step\Run.zig"
       - cargo auditable install --path=. --root="${PREFIX}" --no-track --locked --bins --target-dir=target
       - cargo-bundle-licenses --format=yaml --output=./THIRDPARTY.yml
+      - >
+        mkdir -p
+          "${PREFIX}/share/bash-completion/completions"
+          "${PREFIX}/share/zsh/site-functions"
+          "${PREFIX}/share/fish/vendor_completions.d"
+          "${PREFIX}/share/elvish/lib"
+          "${PREFIX}/share/herdr/completions"
+      - herdr completion bash > "${PREFIX}/share/bash-completion/completions/herdr"
+      - herdr completion zsh > "${PREFIX}/share/zsh/site-functions/_herdr"
+      - herdr completion fish > "${PREFIX}/share/fish/vendor_completions.d/herdr.fish"
+      - herdr completion elvish > "${PREFIX}/share/elvish/lib/herdr.elv"
+      - herdr completion powershell > "${PREFIX}/share/herdr/completions/herdr.ps1"
 
 requirements:
   build:
@@ -43,6 +55,12 @@ tests:
   - package_contents:
       bin:
         - herdr
+      files:
+        - share/bash-completion/completions/herdr
+        - share/zsh/site-functions/_herdr
+        - share/fish/vendor_completions.d/herdr.fish
+        - share/elvish/lib/herdr.elv
+        - share/herdr/completions/herdr.ps1
       strict: true
   - script:
       - herdr --version
