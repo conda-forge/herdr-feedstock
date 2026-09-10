@@ -23,13 +23,8 @@ build:
     content:
       # Tell `pixi global` to not set CONDA_PREFIX during activation
       # https://pixi.sh/dev/global_tools/introduction/#opt-out-of-conda_prefix
-      - if: win
-        then:
-          - if not exist "%PREFIX%\\etc\\pixi\\herdr" mkdir "%PREFIX%\\etc\\pixi\\herdr"
-          - type nul > "%PREFIX%\\etc\\pixi\\herdr\\global-ignore-conda-prefix"
-        else:
-          - mkdir -p "${PREFIX}/etc/pixi/herdr"
-          - touch "${PREFIX}/etc/pixi/herdr/global-ignore-conda-prefix"
+      - mkdir -p "${PREFIX}/etc/pixi/herdr"
+      - touch "${PREFIX}/etc/pixi/herdr/global-ignore-conda-prefix"
       - if: win
         then:
           # workaround for zig 0.15.2 bug: convertPathArg panics on cross-drive paths (Build/Step/Run.zig)
