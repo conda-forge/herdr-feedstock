@@ -229,4 +229,5 @@ Feedstock Maintainers
 =====================
 
 * [@eunos-1128](https://github.com/eunos-1128/)
+* [@pavelzw](https://github.com/pavelzw/)
 
