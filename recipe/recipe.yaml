@@ -25,10 +25,6 @@ build:
       # https://pixi.sh/dev/global_tools/introduction/#opt-out-of-conda_prefix
       - mkdir -p "${PREFIX}/etc/pixi/herdr"
       - touch "${PREFIX}/etc/pixi/herdr/global-ignore-conda-prefix"
-      - if: win
-        then:
-          # workaround for zig 0.15.2 bug: convertPathArg panics on cross-drive paths (Build/Step/Run.zig)
-          - sed -i "s|assert(!std\.fs\.path\.isAbsolute(child_cwd_rel));|if (std.fs.path.isAbsolute(child_cwd_rel)) return child_cwd_rel;|" "${BUILD_PREFIX}/Library/lib/zig/std/Build/Step/Run.zig"
       - cargo auditable install --path=. --root="${PREFIX}" --no-track --locked --bins --target-dir=target
       - cargo-bundle-licenses --format=yaml --output=./THIRDPARTY.yml
       - |
@@ -49,11 +45,12 @@ requirements:
     - ${{ compiler('c') }}
     - ${{ compiler('rust') }}
     - ${{ stdlib('c') }}
-    - ${{ 'm2-sed' if win }}
     - brush
     - cargo-auditable
     - cargo-bundle-licenses
-    - zig
+    # herdr requires zig 0.16.x (build.rs checks the version) and the Windows
+    # patch below is written against the zig 0.16 std.Build API
+    - 'zig >=0.16.0,<0.17'
 
 tests:
   - package_contents:
