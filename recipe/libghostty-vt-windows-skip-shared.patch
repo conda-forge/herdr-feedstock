@@ -1,0 +1,17 @@
+diff --git a/vendor/libghostty-vt/build.zig b/vendor/libghostty-vt/build.zig
+--- a/vendor/libghostty-vt/build.zig
++++ b/vendor/libghostty-vt/build.zig
+@@ -136,6 +136,13 @@
+         }
+         if (native_freestanding) break :shared null;
+ 
++        // Herdr links the static libghostty-vt on Windows (see build.rs),
++        // so the DLL is never consumed there. Skip it: linking a DLL
++        // against the MSVC CRT needs the full static CRT chain, whose
++        // memset collides with the strong memset exported by
++        // quirks_memset.zig for shared libraries.
++        if (config.target.result.os.tag == .windows) break :shared null;
++
+         break :shared try buildpkg.GhosttyLibVt.initShared(
+             b,
+             &mod,

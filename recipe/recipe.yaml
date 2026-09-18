@@ -1,5 +1,5 @@
 context:
-  version: "0.9.0"
+  version: "0.9.1"
 
 package:
   name: herdr
@@ -7,14 +7,16 @@ package:
 
 source:
   url: https://github.com/ogulcancelik/herdr/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 1e83bff4b05834ed8281e16f1680e8f3e58375a94b2e3f2b3d021e28e293ef9a
+  sha256: 03403d3ef80dcf2b954dd5d27eb636e6c4f5279d240b48de272b7f53e4b73093
   patches:
-    # Fix libghostty-vt shared DLL missing ucrt/vcruntime link on Windows (cf. GhosttyLib.zig)
+    # Don't build the libghostty-vt DLL on Windows; herdr's build.rs links the
+    # static lib there, and the DLL fails to link against the MSVC CRT
+    # (duplicate memset, see quirks_memset.zig).
     # TODO: Submit PR to upstream
-    - ${{ 'libghostty-vt-windows-msvc-crt.patch' if win }}
+    - ${{ 'libghostty-vt-windows-skip-shared.patch' if win }}
 
 build:
-  number: 1
+  number: 0
   script:
     interpreter: brush
     env:
@@ -25,10 +27,6 @@ build:
       # https://pixi.sh/dev/global_tools/introduction/#opt-out-of-conda_prefix
       - mkdir -p "${PREFIX}/etc/pixi/herdr"
       - touch "${PREFIX}/etc/pixi/herdr/global-ignore-conda-prefix"
-      - if: win
-        then:
-          # workaround for zig 0.15.2 bug: convertPathArg panics on cross-drive paths (Build/Step/Run.zig)
-          - sed -i "s|assert(!std\.fs\.path\.isAbsolute(child_cwd_rel));|if (std.fs.path.isAbsolute(child_cwd_rel)) return child_cwd_rel;|" "${BUILD_PREFIX}/Library/lib/zig/std/Build/Step/Run.zig"
       - cargo auditable install --path=. --root="${PREFIX}" --no-track --locked --bins --target-dir=target
       - cargo-bundle-licenses --format=yaml --output=./THIRDPARTY.yml
       - |
@@ -49,11 +47,12 @@ requirements:
     - ${{ compiler('c') }}
     - ${{ compiler('rust') }}
     - ${{ stdlib('c') }}
-    - ${{ 'm2-sed' if win }}
     - brush
     - cargo-auditable
     - cargo-bundle-licenses
-    - 'zig >=0.15.2,<0.16'  # upstream issue: https://github.com/ogulcancelik/herdr/issues/285
+    # herdr requires zig 0.16.x (build.rs checks the version) and the Windows
+    # patch below is written against the zig 0.16 std.Build API
+    - 'zig >=0.16.0,<0.17'
 
 tests:
   - package_contents:
