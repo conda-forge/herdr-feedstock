@@ -9,9 +9,11 @@ source:
   url: https://github.com/ogulcancelik/herdr/archive/refs/tags/v${{ version }}.tar.gz
   sha256: 03403d3ef80dcf2b954dd5d27eb636e6c4f5279d240b48de272b7f53e4b73093
   patches:
-    # Fix libghostty-vt shared DLL missing ucrt/vcruntime link on Windows (cf. GhosttyLib.zig)
+    # Don't build the libghostty-vt DLL on Windows; herdr's build.rs links the
+    # static lib there, and the DLL fails to link against the MSVC CRT
+    # (duplicate memset, see quirks_memset.zig).
     # TODO: Submit PR to upstream
-    - ${{ 'libghostty-vt-windows-msvc-crt.patch' if win }}
+    - ${{ 'libghostty-vt-windows-skip-shared.patch' if win }}
 
 build:
   number: 0
