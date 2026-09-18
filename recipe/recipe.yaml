@@ -53,7 +53,7 @@ requirements:
     - brush
     - cargo-auditable
     - cargo-bundle-licenses
-    - 'zig >=0.15.2,<0.16'  # upstream issue: https://github.com/ogulcancelik/herdr/issues/285
+    - zig
 
 tests:
   - package_contents:
