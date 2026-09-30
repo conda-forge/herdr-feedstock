@@ -1,5 +1,5 @@
 context:
-  version: "0.9.2"
+  version: "0.9.3"
 
 package:
   name: herdr
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/ogulcancelik/herdr/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: ff1a8ded511d29f84c3cc97816b4ea3510f10953166a185e669e9e7339100a8d
+  sha256: e48f6706440c92362773663131ef5b524c62549523e50a03f2b55d315edca100
   patches:
     # Don't build the libghostty-vt DLL on Windows; herdr's build.rs links the
     # static lib there, and the DLL fails to link against the MSVC CRT
